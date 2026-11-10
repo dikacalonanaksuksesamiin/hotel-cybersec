@@ -179,6 +179,10 @@ app.get('/api/reports/export-csv', authenticateToken, requireRole('admin'), (req
     res.send(csv);
 });
 
-app.listen(PORT, () => {
-    console.log(`Server Hotel Booking berjalan di port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server berjalan di port ${PORT}`);
+    });
+}
+
+module.exports = app;
