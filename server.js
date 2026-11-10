@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -15,12 +16,12 @@ app.use(helmet()); // Mengaktifkan Security Headers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rate Limiter untuk mencegah brute force pada login
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 menit
-    max: 10, // Maksimal 10 percobaaan per IP
+    max: 10, // Maksimal 10 percobaan per IP
     message: { error: 'Terlalu banyak percobaan login. Coba lagi nanti.' }
 });
 
@@ -59,9 +60,14 @@ const requireRole = (role) => {
     };
 };
 
+// --- RUTE HALAMAN UTAMA WEB ---
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // --- ENDPOINT AUTENTIKASI ---
 
-// Registrasi User / Admin[cite: 1]
+// Registrasi User / Admin
 app.post('/api/register', async (req, res) => {
     try {
         const username = sanitizeInput(req.body.username);
@@ -75,7 +81,7 @@ app.post('/api/register', async (req, res) => {
         const existingUser = users.find(u => u.username === username);
         if (existingUser) return res.status(400).json({ error: 'Username sudah digunakan.' });
 
-        // Hash Password menggunakan Bcrypt[cite: 1]
+        // Hash Password menggunakan Bcrypt
         const hashedPassword = await bcrypt.hash(password, 10);
         users.push({ id: users.length + 1, username, password: hashedPassword, role });
 
@@ -85,7 +91,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// Login User[cite: 1, 2]
+// Login User
 app.post('/api/login', loginLimiter, async (req, res) => {
     const username = sanitizeInput(req.body.username);
     const password = req.body.password;
@@ -115,14 +121,14 @@ app.post('/api/logout', (req, res) => {
     res.json({ message: 'Logout berhasil.' });
 });
 
-// --- ENDPOINT FITUR CRUD (Pemesanan & Kamar) ---[cite: 1]
+// --- ENDPOINT FITUR CRUD (Pemesanan & Kamar) ---
 
-// Read: Lihat Daftar Kamar (Publik/User)
+// Read: Lihat Daftar Kamar
 app.get('/api/rooms', authenticateToken, (req, res) => {
     res.json(rooms);
 });
 
-// Create: Buat Pemesanan Kamar (Customer)[cite: 1]
+// Create: Buat Pemesanan Kamar (Customer)
 app.post('/api/bookings', authenticateToken, (req, res) => {
     const roomId = parseInt(req.body.roomId);
     const checkInDate = sanitizeInput(req.body.checkInDate);
@@ -146,7 +152,7 @@ app.post('/api/bookings', authenticateToken, (req, res) => {
     res.status(201).json({ message: 'Pemesanan kamar berhasil!', booking: newBooking });
 });
 
-// Update & Delete: Admin Only (CRUD Kamar)[cite: 1, 2]
+// Update/Add: Admin Only (CRUD Kamar)
 app.post('/api/rooms/add', authenticateToken, requireRole('admin'), (req, res) => {
     const name = sanitizeInput(req.body.name);
     const price = parseInt(req.body.price);
@@ -156,9 +162,9 @@ app.post('/api/rooms/add', authenticateToken, requireRole('admin'), (req, res) =
     res.status(201).json({ message: 'Kamar berhasil ditambahkan.', room: newRoom });
 });
 
-// --- ENDPOINT LAPORAN (Rekapitulasi Data) ---[cite: 1]
+// --- ENDPOINT LAPORAN (Rekapitulasi Data) ---
 
-// Laporan Rekap Pemesanan (Admin Only)[cite: 1, 2]
+// Laporan Rekap Pemesanan (Admin Only)
 app.get('/api/reports/recap', authenticateToken, requireRole('admin'), (req, res) => {
     const totalIncome = bookings.reduce((sum, b) => sum + b.price, 0);
     res.json({
@@ -168,7 +174,7 @@ app.get('/api/reports/recap', authenticateToken, requireRole('admin'), (req, res
     });
 });
 
-// Ekspor Laporan CSV (Nilai Tambah Tugas)[cite: 1]
+// Ekspor Laporan CSV
 app.get('/api/reports/export-csv', authenticateToken, requireRole('admin'), (req, res) => {
     let csv = 'ID,Username,Kamar,Harga,Tanggal\n';
     bookings.forEach(b => {
@@ -179,9 +185,10 @@ app.get('/api/reports/export-csv', authenticateToken, requireRole('admin'), (req
     res.send(csv);
 });
 
+// Kompatibilitas Server Lokal & Vercel Serverless
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
-        console.log(`Server berjalan di port ${PORT}`);
+        console.log(`Server Hotel Booking berjalan di port ${PORT}`);
     });
 }
 
