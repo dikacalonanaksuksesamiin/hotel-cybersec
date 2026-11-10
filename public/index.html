@@ -3,259 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand CyberSec Hotel - Booking System</title>
-    <!-- Tailwind CSS CDN -->
+    <title>ROYALE HOTEL - Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-header { background-color: #2b7a9e; }
+        .sidebar-item-active { background-color: #ffffff; color: #2b7a9e; font-weight: 700; border-left: 4px solid #0284c7; }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+<body class="bg-gray-100 font-sans min-h-screen">
 
-    <!-- Navbar -->
-    <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-hotel text-blue-500 text-2xl"></i>
-                <h1 class="text-xl font-bold text-white tracking-wide">Grand CyberSec Hotel</h1>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-slate-800 p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-hotel text-cyan-600 text-4xl mb-2"></i>
+                <h2 class="text-2xl font-bold text-gray-800">ROYALE HOTEL</h2>
+                <p class="text-xs text-gray-500">Sistem Informasi Manajemen & Cyber Security</p>
             </div>
-            <div id="userStatus" class="flex items-center gap-4 hidden">
-                <span id="userInfo" class="text-sm font-medium bg-slate-700 px-3 py-1.5 rounded-full border border-slate-600"></span>
-                <button onclick="logout()" class="text-sm text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 transition">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto px-4 py-8 space-y-8">
-
-        <!-- 1. Form Auth (Login / Register) -->
-        <div id="authSection" class="max-w-md mx-auto bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
-            <div class="flex justify-center border-b border-slate-700 mb-6 pb-2 gap-4">
-                <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="font-semibold text-blue-400 border-b-2 border-blue-500 pb-2 px-4 transition">Login</button>
-                <button id="tabRegBtn" onclick="switchAuthTab('register')" class="font-semibold text-slate-400 pb-2 px-4 transition">Registrasi</button>
+            
+            <div class="flex border-b mb-4 text-sm font-semibold">
+                <button id="btnTabLogin" onclick="setAuthMode('login')" class="flex-1 py-2 text-cyan-600 border-b-2 border-cyan-600">Login</button>
+                <button id="btnTabRegister" onclick="setAuthMode('register')" class="flex-1 py-2 text-gray-400">Registrasi</button>
             </div>
 
-            <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1 font-medium">Username</label>
-                    <input type="text" id="username" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 text-sm">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Username</label>
+                    <input type="text" id="authUsername" required class="w-full border px-3 py-2 rounded text-sm focus:outline-none focus:border-cyan-600">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1 font-medium">Password</label>
-                    <input type="password" id="password" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 text-sm">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Password</label>
+                    <input type="password" id="authPassword" required class="w-full border px-3 py-2 rounded text-sm focus:outline-none focus:border-cyan-600">
                 </div>
-                <div id="roleSelectGroup" class="hidden">
-                    <label class="block text-xs text-slate-400 mb-1 font-medium">Hak Akses (Role)</label>
-                    <select id="role" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 text-sm text-slate-300">
-                        <option value="customer">Customer (Tamu)</option>
-                        <option value="admin">Admin (Resepsionis)</option>
+                <div id="roleField" class="hidden">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Level Hak Akses</label>
+                    <select id="authRole" class="w-full border px-3 py-2 rounded text-sm focus:outline-none">
+                        <option value="customer">Customer / Warga</option>
+                        <option value="admin">Admin / Resepsionis</option>
                     </select>
                 </div>
-                <button type="submit" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-500 font-semibold py-2.5 rounded-lg text-sm transition shadow-lg shadow-blue-900/40">
-                    Masuk Sekarang
+                <button type="submit" id="authSubmitBtn" class="w-full bg-cyan-700 hover:bg-cyan-800 text-white py-2 rounded text-sm font-bold shadow">
+                    LOG IN
                 </button>
             </form>
         </div>
+    </div>
 
-        <!-- 2. Main Dashboard (Setelah Login) -->
-        <div id="mainDashboard" class="hidden space-y-8">
-            
-            <!-- Admin CRUD & Control Panel -->
-            <div id="adminPanel" class="hidden bg-slate-800 p-6 rounded-2xl border border-amber-500/30 space-y-6">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-4">
-                    <div class="flex items-center gap-2 text-amber-400">
-                        <i class="fa-solid fa-user-shield text-xl"></i>
-                        <h2 class="text-lg font-bold">Panel Admin - Kelola Kamar & Laporan</h2>
-                    </div>
-                    <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                        <i class="fa-solid fa-file-csv text-base"></i> Ekspor Laporan CSV
-                    </button>
-                </div>
-
-                <!-- Form Tambah Kamar (CRUD Create) -->
-                <form onsubmit="handleAddRoom(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input type="text" id="newRoomName" placeholder="Nama Tipe Kamar Baru" required class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
-                    <input type="number" id="newRoomPrice" placeholder="Harga per Malam (Rp)" required class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
-                    <button type="submit" class="bg-amber-600 hover:bg-amber-500 font-semibold text-sm py-2 rounded-lg transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Tambah Kamar (CRUD)
-                    </button>
-                </form>
-
-                <!-- Rekap Data Ringkas -->
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700/60">
-                    <button onclick="getAdminReport()" class="text-xs text-blue-400 hover:underline font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-chart-line"></i> Refresh Rekap Laporan Keuangan
-                    </button>
-                    <pre id="recapOutput" class="mt-2 text-xs text-slate-300 bg-slate-950 p-3 rounded-lg overflow-x-auto border border-slate-800">Klik tombol di atas untuk menampilkan json rekap.</pre>
-                </div>
+    <!-- MAIN APP DASHBOARD LAYOUT -->
+    <div id="appLayout" class="hidden min-h-screen flex flex-col">
+        
+        <!-- TOP HEADER NAVBAR -->
+        <header class="admin-header text-white flex justify-between items-center px-4 py-2.5 shadow-md sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="text-white hover:opacity-80"><i class="fa-solid fa-bars text-lg"></i></button>
+                <span class="font-extrabold tracking-wider text-lg uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-hotel"></i> ROYALEHOTEL
+                </span>
             </div>
+            <div class="flex items-center gap-4 text-xs">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-user-circle text-lg"></i>
+                    <span id="userDisplayName">User</span>
+                </span>
+                <button onclick="logout()" class="hover:underline text-red-200 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-power-off"></i> LOGOUT
+                </button>
+            </div>
+        </header>
 
-            <!-- Katalog Kamar Hotel Grid -->
-            <div>
-                <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-1">
+            <!-- SIDEBAR NAVIGATION -->
+            <aside id="sidebar" class="w-64 bg-slate-800 text-slate-300 text-xs font-semibold flex flex-col shadow-lg border-r border-slate-700">
+                <div class="p-4 bg-slate-900 flex items-center gap-3 border-b border-slate-700">
+                    <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold text-sm">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Katalog Kamar Hotel</h2>
-                        <p class="text-xs text-slate-400 mt-1">Pilih kamar yang sesuai dengan kebutuhan Anda</p>
+                        <p id="sidebarUserName" class="text-white font-bold">User Name</p>
+                        <span id="sidebarUserRole" class="text-[10px] bg-green-600 text-white px-1.5 py-0.5 rounded font-bold">ADMIN_LOGIN</span>
                     </div>
-                    <button onclick="loadRooms()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                        <i class="fa-solid fa-rotate"></i> Refresh
+                </div>
+
+                <div class="text-[10px] text-slate-400 font-bold px-4 pt-4 pb-1 uppercase tracking-wider">Main Navigation</div>
+
+                <nav class="space-y-1">
+                    <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-700 hover:text-white sidebar-item-active">
+                        <i class="fa-solid fa-gauge w-4"></i> DASHBOARD
                     </button>
+                    <button onclick="switchView('rooms')" id="nav-rooms" class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-700 hover:text-white">
+                        <i class="fa-solid fa-bed w-4"></i> DATA KAMAR
+                    </button>
+                    <button onclick="switchView('customers')" id="nav-customers" class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-700 hover:text-white admin-only">
+                        <i class="fa-solid fa-users w-4"></i> DATA CUSTOMER
+                    </button>
+                    <button onclick="switchView('bookings')" id="nav-bookings" class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-700 hover:text-white">
+                        <i class="fa-solid fa-receipt w-4"></i> TRANSAKSI / BOOKING
+                    </button>
+                    <button onclick="switchView('reports')" id="nav-reports" class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-700 hover:text-white admin-only">
+                        <i class="fa-solid fa-file-invoice-dollar w-4"></i> LAPORAN
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 p-6 overflow-y-auto">
+                
+                <!-- VIEW 1: DASHBOARD -->
+                <div id="view-dashboard" class="space-y-6">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h1 class="text-xl font-semibold text-gray-700">Dashboard <span class="text-xs text-gray-400">Control panel</span></h1>
+                        <span class="text-xs text-gray-500">Home > Dashboard</span>
+                    </div>
+
+                    <!-- 4 METRIC WIDGET CARDS -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Card 1: Jumlah Kamar -->
+                        <div class="bg-emerald-600 text-white rounded shadow p-4 relative overflow-hidden">
+                            <div class="text-3xl font-bold" id="statRooms">0</div>
+                            <div class="text-xs mt-1">Jumlah Kamar</div>
+                            <i class="fa-solid fa-bed text-emerald-800/40 text-5xl absolute right-2 bottom-2"></i>
+                        </div>
+
+                        <!-- Card 2: Kategori Kamar -->
+                        <div class="bg-blue-600 text-white rounded shadow p-4 relative overflow-hidden">
+                            <div class="text-3xl font-bold" id="statCategories">0</div>
+                            <div class="text-xs mt-1">Jumlah Kategori kamar</div>
+                            <i class="fa-solid fa-list text-blue-800/40 text-5xl absolute right-2 bottom-2"></i>
+                        </div>
+
+                        <!-- Card 3: Jumlah Customer -->
+                        <div class="bg-rose-600 text-white rounded shadow p-4 relative overflow-hidden">
+                            <div class="text-3xl font-bold" id="statCustomers">0</div>
+                            <div class="text-xs mt-1">Jumlah Customer</div>
+                            <i class="fa-solid fa-users text-rose-800/40 text-5xl absolute right-2 bottom-2"></i>
+                        </div>
+
+                        <!-- Card 4: Jumlah Transaksi -->
+                        <div class="bg-amber-500 text-white rounded shadow p-4 relative overflow-hidden">
+                            <div class="text-3xl font-bold" id="statTransactions">0</div>
+                            <div class="text-xs mt-1">Jumlah Transaksi</div>
+                            <i class="fa-solid fa-user-plus text-amber-800/40 text-5xl absolute right-2 bottom-2"></i>
+                        </div>
+                    </div>
+
+                    <!-- DETAIL LOGIN BOX -->
+                    <div class="bg-white rounded border shadow-sm">
+                        <div class="bg-gray-50 border-b px-4 py-2 font-bold text-xs text-gray-700">Detail Login</div>
+                        <div class="p-4 space-y-3 text-xs">
+                            <div class="grid grid-cols-4 border-b pb-2">
+                                <span class="font-bold text-gray-600">Nama</span>
+                                <span id="dashName" class="col-span-3 text-gray-800">-</span>
+                            </div>
+                            <div class="grid grid-cols-4 border-b pb-2">
+                                <span class="font-bold text-gray-600">Username</span>
+                                <span id="dashUsername" class="col-span-3 text-gray-800">-</span>
+                            </div>
+                            <div class="grid grid-cols-4">
+                                <span class="font-bold text-gray-600">Level Hak Akses</span>
+                                <span class="col-span-3"><span id="dashRoleBadge" class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">ADMIN</span></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards kamar akan di-render dinamis melalui JavaScript -->
-                </div>
-            </div>
+                <!-- VIEW 2: DATA KAMAR (CRUD) -->
+                <div id="view-rooms" class="hidden space-y-4">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h1 class="text-xl font-semibold text-gray-700">Data Kamar Hotel</h1>
+                        <button onclick="toggleAddRoomForm()" class="admin-only bg-cyan-700 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-cyan-800">
+                            + Tambah Kamar Baru
+                        </button>
+                    </div>
 
+                    <!-- FORM TAMBAH KAMAR -->
+                    <div id="addRoomFormCard" class="hidden bg-white p-4 rounded border shadow-sm space-y-3">
+                        <h3 class="text-xs font-bold text-gray-700 border-b pb-1">Tambah Data Kamar (CRUD)</h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <input type="text" id="roomNameInput" placeholder="Nama Kamar" class="border p-2 rounded text-xs">
+                            <input type="text" id="roomCatInput" placeholder="Kategori (Standard/Deluxe/Suite)" class="border p-2 rounded text-xs">
+                            <input type="number" id="roomPriceInput" placeholder="Harga per Malam" class="border p-2 rounded text-xs">
+                        </div>
+                        <button onclick="saveRoom()" class="bg-green-600 text-white text-xs px-4 py-1.5 rounded font-bold">Simpan Data</button>
+                    </div>
+
+                    <div class="bg-white rounded border shadow-sm overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-800 text-white uppercase">
+                                <tr>
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">Nama Kamar</th>
+                                    <th class="p-3">Kategori</th>
+                                    <th class="p-3">Harga</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roomsTableBody" class="divide-y text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: DATA CUSTOMER (ADMIN ONLY) -->
+                <div id="view-customers" class="hidden space-y-4">
+                    <h1 class="text-xl font-semibold text-gray-700 border-b pb-2">Data Customer Terdaftar</h1>
+                    <div class="bg-white rounded border shadow-sm overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-800 text-white uppercase">
+                                <tr>
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">Nama Lengkap</th>
+                                    <th class="p-3">Username</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody" class="divide-y text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: TRANSAKSI / BOOKING -->
+                <div id="view-bookings" class="hidden space-y-4">
+                    <h1 class="text-xl font-semibold text-gray-700 border-b pb-2">Riwayat Transaksi & Booking</h1>
+                    <div class="bg-white rounded border shadow-sm overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-800 text-white uppercase">
+                                <tr>
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">User</th>
+                                    <th class="p-3">Kamar</th>
+                                    <th class="p-3">Total Harga</th>
+                                    <th class="p-3">Tanggal Check-In</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody" class="divide-y text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW 5: LAPORAN (ADMIN ONLY) -->
+                <div id="view-reports" class="hidden space-y-4">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h1 class="text-xl font-semibold text-gray-700">Laporan Rekapitulasi Keuangan</h1>
+                        <button onclick="exportCSV()" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-emerald-700">
+                            <i class="fa-solid fa-file-csv"></i> Download Rekap CSV
+                        </button>
+                    </div>
+                    <div class="bg-white p-4 rounded border shadow-sm">
+                        <h3 class="text-xs font-bold text-gray-700 mb-2">Ringkasan Laporan PDF/CSV</h3>
+                        <pre id="reportJsonView" class="bg-slate-900 text-green-400 p-3 rounded text-xs font-mono"></pre>
+                    </div>
+                </div>
+
+            </main>
         </div>
-
     </div>
 
     <script>
-        let isLoginTab = true;
-        let currentUserRole = null;
+        let isLoginMode = true;
+        let currentUser = null;
 
-        function switchAuthTab(tab) {
-            isLoginTab = tab === 'login';
-            document.getElementById('tabLoginBtn').className = isLoginTab ? 'font-semibold text-blue-400 border-b-2 border-blue-500 pb-2 px-4 transition' : 'font-semibold text-slate-400 pb-2 px-4 transition';
-            document.getElementById('tabRegBtn').className = !isLoginTab ? 'font-semibold text-blue-400 border-b-2 border-blue-500 pb-2 px-4 transition' : 'font-semibold text-slate-400 pb-2 px-4 transition';
-            document.getElementById('roleSelectGroup').className = !isLoginTab ? 'block' : 'hidden';
-            document.getElementById('authSubmitBtn').innerText = isLoginTab ? 'Masuk Sekarang' : 'Daftar Akun Baru';
+        function setAuthMode(mode) {
+            isLoginMode = mode === 'login';
+            document.getElementById('btnTabLogin').className = isLoginMode ? 'flex-1 py-2 text-cyan-600 border-b-2 border-cyan-600' : 'flex-1 py-2 text-gray-400';
+            document.getElementById('btnTabRegister').className = !isLoginMode ? 'flex-1 py-2 text-cyan-600 border-b-2 border-cyan-600' : 'flex-1 py-2 text-gray-400';
+            document.getElementById('roleField').className = !isLoginMode ? 'block' : 'hidden';
+            document.getElementById('authSubmitBtn').innerText = isLoginMode ? 'LOG IN' : 'DAFTAR AKUN';
         }
 
-        async function handleAuth(e) {
+        async function handleAuthSubmit(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
+            const username = document.getElementById('authUsername').value;
+            const password = document.getElementById('authPassword').value;
+            const role = document.getElementById('authRole').value;
 
-            const endpoint = isLoginTab ? '/api/login' : '/api/register';
-            const bodyData = isLoginTab ? { username, password } : { username, password, role };
+            const url = isLoginMode ? '/api/login' : '/api/register';
+            const payload = isLoginMode ? { username, password } : { username, password, role };
 
             try {
-                const res = await fetch(endpoint, {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(bodyData)
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-
-                if (!res.ok) throw new Error(data.error || 'Terjadi kesalahan.');
+                if (!res.ok) throw new Error(data.error);
 
                 alert(data.message);
-                if (isLoginTab) {
-                    currentUserRole = data.role;
-                    showDashboard(data.username, data.role);
+                if (isLoginMode) {
+                    currentUser = data;
+                    renderApp();
                 } else {
-                    switchAuthTab('login');
+                    setAuthMode('login');
                 }
             } catch (err) {
                 alert(err.message);
             }
         }
 
-        function showDashboard(username, role) {
-            document.getElementById('authSection').classList.add('hidden');
-            document.getElementById('mainDashboard').classList.remove('hidden');
-            document.getElementById('userStatus').classList.remove('hidden');
-            document.getElementById('userInfo').innerHTML = `<i class="fa-solid fa-user text-blue-400 mr-1"></i> ${username} (<span class="uppercase text-xs text-blue-300 font-bold">${role}</span>)`;
+        function renderApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appLayout').classList.remove('hidden');
 
-            if (role === 'admin') {
-                document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('userDisplayName').innerText = currentUser.name;
+            document.getElementById('sidebarUserName').innerText = currentUser.name;
+            document.getElementById('sidebarUserRole').innerText = currentUser.role.toUpperCase();
+            
+            document.getElementById('dashName').innerText = currentUser.name;
+            document.getElementById('dashUsername').innerText = currentUser.username;
+            document.getElementById('dashRoleBadge').innerText = currentUser.role.toUpperCase();
+
+            if (currentUser.role !== 'admin') {
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
             }
-            loadRooms();
+
+            loadStats();
+            switchView('dashboard');
+        }
+
+        function switchView(viewName) {
+            const views = ['dashboard', 'rooms', 'customers', 'bookings', 'reports'];
+            views.forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                const navBtn = document.getElementById(`nav-${v}`);
+                if (navBtn) navBtn.classList.remove('sidebar-item-active');
+            });
+
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            if (activeNav) activeNav.classList.add('sidebar-item-active');
+
+            if (viewName === 'rooms') loadRooms();
+            if (viewName === 'customers') loadCustomers();
+            if (viewName === 'bookings') loadBookings();
+            if (viewName === 'reports') loadReports();
+        }
+
+        async function loadStats() {
+            const res = await fetch('/api/stats');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('statRooms').innerText = data.totalRooms;
+                document.getElementById('statCategories').innerText = data.totalCategories;
+                document.getElementById('statCustomers').innerText = data.totalCustomers;
+                document.getElementById('statTransactions').innerText = data.totalTransactions;
+            }
         }
 
         async function loadRooms() {
-            try {
-                const res = await fetch('/api/rooms');
-                if (!res.ok) return;
-                const rooms = await res.json();
-
-                const grid = document.getElementById('roomsGrid');
-                grid.innerHTML = '';
-
-                rooms.forEach(room => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-lg hover:border-slate-600 transition flex flex-col justify-between';
-                    card.innerHTML = `
-                        <div>
-                            <div class="h-44 bg-slate-700 relative flex items-center justify-center">
-                                <i class="fa-solid fa-bed text-5xl text-slate-500"></i>
-                                <span class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-full font-semibold">
-                                    ${room.status}
-                                </span>
-                            </div>
-                            <div class="p-5 space-y-2">
-                                <h3 class="text-lg font-bold text-white">${room.name}</h3>
-                                <p class="text-blue-400 text-xl font-extrabold">Rp ${room.price.toLocaleString('id-ID')} <span class="text-xs text-slate-400 font-normal">/ malam</span></p>
-                                <p class="text-xs text-slate-400">Fasilitas: AC, Free Wi-Fi, Breakfast, Smart TV</p>
-                            </div>
-                        </div>
-                        <div class="p-5 pt-0">
-                            <div class="space-y-2">
-                                <input type="date" id="date-${room.id}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500">
-                                <button onclick="bookRoom(${room.id})" class="w-full bg-blue-600 hover:bg-blue-500 font-semibold py-2 rounded-lg text-xs transition flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-calendar-check"></i> Pesan Kamar
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (err) {
-                console.error(err);
-            }
+            const res = await fetch('/api/rooms');
+            const rooms = await res.json();
+            const tbody = document.getElementById('roomsTableBody');
+            tbody.innerHTML = '';
+            rooms.forEach(r => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3">${r.id}</td>
+                        <td class="p-3 font-semibold">${r.name}</td>
+                        <td class="p-3">${r.category}</td>
+                        <td class="p-3">Rp ${r.price.toLocaleString('id-ID')}</td>
+                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">${r.status}</span></td>
+                        <td class="p-3 space-x-2">
+                            <button onclick="bookRoomModal(${r.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px]">Pesan</button>
+                            ${currentUser.role === 'admin' ? `<button onclick="deleteRoom(${r.id})" class="bg-red-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
         }
 
-        async function bookRoom(roomId) {
-            const checkInDate = document.getElementById(`date-${roomId}`).value;
-            if (!checkInDate) return alert('Silakan pilih tanggal check-in terlebih dahulu!');
+        async function bookRoomModal(roomId) {
+            const date = prompt("Masukkan Tanggal Check-In (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+            if (!date) return;
 
-            try {
-                const res = await fetch('/api/bookings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId, checkInDate })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
-                alert(data.message);
-            } catch (err) {
-                alert(err.message);
-            }
+            const res = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roomId, checkInDate: date })
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+            loadStats();
         }
 
-        async function handleAddRoom(e) {
-            e.preventDefault();
-            const name = document.getElementById('newRoomName').value;
-            const price = document.getElementById('newRoomPrice').value;
-
-            try {
-                const res = await fetch('/api/rooms/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, price })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
-                alert(data.message);
-                document.getElementById('newRoomName').value = '';
-                document.getElementById('newRoomPrice').value = '';
-                loadRooms();
-            } catch (err) {
-                alert(err.message);
-            }
+        function toggleAddRoomForm() {
+            document.getElementById('addRoomFormCard').classList.toggle('hidden');
         }
 
-        async function getAdminReport() {
-            try {
-                const res = await fetch('/api/reports/recap');
-                const data = await res.json();
-                document.getElementById('recapOutput').innerText = JSON.stringify(data, null, 2);
-            } catch (err) {
-                alert('Gagal mengambil laporan admin.');
-            }
+        async function saveRoom() {
+            const name = document.getElementById('roomNameInput').value;
+            const category = document.getElementById('roomCatInput').value;
+            const price = document.getElementById('roomPriceInput').value;
+
+            const res = await fetch('/api/rooms/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, category, price })
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+            toggleAddRoomForm();
+            loadRooms();
+            loadStats();
+        }
+
+        async function deleteRoom(id) {
+            if (!confirm('Yakin ingin menghapus kamar ini?')) return;
+            const res = await fetch(`/api/rooms/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            alert(data.message || data.error);
+            loadRooms();
+            loadStats();
+        }
+
+        async function loadCustomers() {
+            const res = await fetch('/api/customers');
+            if (!res.ok) return;
+            const list = await res.json();
+            const tbody = document.getElementById('customersTableBody');
+            tbody.innerHTML = '';
+            list.forEach(c => {
+                tbody.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3">${c.id}</td><td class="p-3">${c.name}</td><td class="p-3">${c.username}</td></tr>`;
+            });
+        }
+
+        async function loadBookings() {
+            const res = await fetch('/api/bookings');
+            const list = await res.json();
+            const tbody = document.getElementById('bookingsTableBody');
+            tbody.innerHTML = '';
+            list.forEach(b => {
+                tbody.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3">${b.id}</td><td class="p-3">${b.username}</td><td class="p-3">${b.roomName}</td><td class="p-3">Rp ${b.price.toLocaleString('id-ID')}</td><td class="p-3">${b.checkInDate}</td></tr>`;
+            });
+        }
+
+        async function loadReports() {
+            const res = await fetch('/api/reports/recap');
+            if (!res.ok) return;
+            const data = await res.json();
+            document.getElementById('reportJsonView').innerText = JSON.stringify(data, null, 2);
         }
 
         function exportCSV() {
@@ -265,6 +450,10 @@
         async function logout() {
             await fetch('/api/logout', { method: 'POST' });
             location.reload();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('hidden');
         }
     </script>
 </body>
